@@ -6,14 +6,19 @@ fn main() {
     config
         .define("LIBSAMPLERATE_TESTS", "OFF")
         .define("LIBSAMPLERATE_EXAMPLES", "OFF")
+        .define("BUILD_SHARED_LIBS", "OFF")
         .define("LIBSAMPLERATE_INSTALL", "OFF");
 
-    if std::env::var("TARGET").unwrap().contains("x86_64-apple-darwin") {
-        config
-            .define("CMAKE_OSX_ARCHITECTURES", "x86_64");
-    } else if std::env::var("TARGET").unwrap().contains("aarch64-apple-darwin") {
-        config
-            .define("CMAKE_OSX_ARCHITECTURES", "arm64");
+    if std::env::var("TARGET")
+        .unwrap()
+        .contains("x86_64-apple-darwin")
+    {
+        config.define("CMAKE_OSX_ARCHITECTURES", "x86_64");
+    } else if std::env::var("TARGET")
+        .unwrap()
+        .contains("aarch64-apple-darwin")
+    {
+        config.define("CMAKE_OSX_ARCHITECTURES", "arm64");
     } else if std::env::var("TARGET").unwrap().contains("-ios") {
         config
             .define("CMAKE_TOOLCHAIN_FILE", format!("{}/ios-cmake/ios.toolchain.cmake", manifest_path))
@@ -23,17 +28,18 @@ fn main() {
             .generator("Xcode");
     }
 
-    config
-        .build_target("samplerate");
+    config.build_target("samplerate");
 
     let mut path = config.build();
 
     if std::env::var("TARGET").unwrap().contains("msvc") {
         path = path.join("build").join(config.get_profile());
     } else if std::env::var("TARGET").unwrap().contains("-ios") {
-        path = path.join("build").join(format!("{}-iphoneos", config.get_profile()));
+        path = path
+            .join("build")
+            .join(format!("{}-iphoneos", config.get_profile()));
     } else {
-        path = path.join("build");
+        path = path.join("build/src");
     }
 
     println!("cargo:rustc-link-search=native={}", path.display());
