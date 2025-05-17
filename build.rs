@@ -33,10 +33,10 @@ fn main() {
     let mut path = config.build();
 
     if std::env::var("TARGET").unwrap().contains("msvc") {
-        path = path.join("build").join(config.get_profile());
+        path = path.join("build/src").join(config.get_profile());
     } else if std::env::var("TARGET").unwrap().contains("-ios") {
         path = path
-            .join("build")
+            .join("build/src")
             .join(format!("{}-iphoneos", config.get_profile()));
     } else {
         path = path.join("build/src");
